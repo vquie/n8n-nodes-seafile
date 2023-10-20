@@ -106,12 +106,18 @@ export class Seafile implements INodeType {
                     filename: filename,
                     content: content,
                 },
+                headers: {
+									'Authorization': `Bearer ${credentials.apiKey}`, // assuming your API key is stored under a property "apiKey"
+                },
             };
         } else if (operation === 'download') {
             options = {
                 method: 'GET',
                 uri: `${credentials.url}/api2/repos/${repo_id}/file/?p=${path}${filename}`,
-            };
+                headers: {
+									'Authorization': `Bearer ${credentials.apiKey}`, // assuming your API key is stored under a property "apiKey"
+								},
+							};
         }
 
         const response = await this.helpers.request(options);
