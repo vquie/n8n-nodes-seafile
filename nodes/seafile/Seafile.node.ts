@@ -1,130 +1,147 @@
 import {
-	IExecuteFunctions,
-	INodeExecutionData,
-	INodeType,
-	INodeTypeDescription,
-	NodeOperationError
+    IExecuteFunctions,
+    INodeExecutionData,
+    INodeType,
+    INodeTypeDescription
 } from 'n8n-workflow';
 
 export class Seafile implements INodeType {
-    description: INodeTypeDescription = {
-        displayName: 'Seafile',
-        name: 'seafile',
-        icon: 'file:seafile.png',
-        group: ['input'],
-        version: 1,
-        description: 'Consume Seafile API',
-        defaults: {
-            name: 'Seafile',
-            color: '#1A82e2',
-        },
-        inputs: ['main'],
-        outputs: ['main'],
-        credentials: [
-            {
-                name: 'seafileApi',
-                required: true,
-            },
-        ],
-        properties: [
-            {
-                displayName: 'Operation',
-                name: 'operation',
-                type: 'options',
-                options: [
-                    {
-                        name: 'Create',
-                        value: 'create',
-                        description: 'Create a file',
+	description: INodeTypeDescription = {
+			displayName: 'Seafile',
+			name: 'seafile',
+			icon: 'file:seafile.png',
+			group: ['input'],
+			version: 1,
+			description: 'Consume Seafile API',
+			defaults: {
+					name: 'Seafile',
+					color: '#1A82e2',
+			},
+			inputs: ['main'],
+			outputs: ['main'],
+			credentials: [
+					{
+							name: 'seafileApi',
+							required: true,
+					},
+			],
+			properties: [
+					{
+							displayName: 'Operation',
+							name: 'operation',
+							type: 'options',
+							options: [
+									{
+											name: 'Create',
+											value: 'create',
+											description: 'Create a file',
+									},
+									{
+											name: 'Download',
+											value: 'download',
+											description: 'Download a file',
+									},
+							],
+							default: 'create',
+							description: 'The operation to perform.',
+					},
+					{
+							displayName: 'Repository ID',
+							name: 'repo_id',
+							type: 'string',
+							default: '',
+							required: true,
+							description: 'The ID of the repository.',
+					},
+					{
+							displayName: 'Path',
+							name: 'path',
+							type: 'string',
+							default: '/',
+							required: true,
+							description: 'Path to the directory.',
+					},
+					{
+							displayName: 'Filename',
+							name: 'filename',
+							type: 'string',
+							default: '',
+							required: true,
+							description: "The file's name.",
+					},
+					{
+							displayName: 'Content',
+							name: 'content',
+							type: 'string',
+							default: '',
+							displayOptions: { show: { operation: ['create'] } },
+							description: "The file's content.",
+					},
+			],
+	};
+
+    async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][] | null> {
+        const items = this.getInputData();
+        const returnData: INodeExecutionData[] = [];
+        for (let i = 0; i < items.length; i++) {
+            const operation = this.getNodeParameter('operation', i);
+            const repo_id = this.getNodeParameter('repo_id', i);
+            const path = this.getNodeParameter('path', i);
+            const filename = this.getNodeParameter('filename', i);
+            const credentials = await this.getCredentials('seafileApi');
+
+            if (operation === 'create') {
+                const content = this.getNodeParameter('content', i);
+
+                const getUploadLinkOptions = {
+                    method: 'GET',
+                    uri: `${credentials.url}/api2/repos/${repo_id}/upload-link/?p=${path}`,
+                    headers: {
+                        'Authorization': `Token ${credentials.apiKey}`,
                     },
-                    {
-                        name: 'Download',
-                        value: 'download',
-                        description: 'Download a file',
+                };
+
+                const uploadLink = await this.helpers.request(getUploadLinkOptions);
+								const sanitizedUploadLink = uploadLink.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+
+                if (uploadLink) {
+                    const options = {
+                        method: 'POST',
+                        uri: sanitizedUploadLink,
+                        formData: {
+                            "filename": filename,
+                            "file": content,
+														"parent_dir": path,
+                        },
+                        headers: {
+                            'Authorization': `Token ${credentials.apiKey}`,
+                        },
+                    };
+
+										try {
+											console.log("Options: ", JSON.stringify(options, null, 2));
+											const response = await this.helpers.request(options);
+											console.log("response: " + response);
+											returnData.push({ json: { data: this.helpers.returnJsonArray([response]) }});
+										} catch (error) {
+												console.error("Caught error during request: ", error.message);
+										}
+                }
+            }
+            else if(operation === 'download'){
+                const options = {
+                    method: 'GET',
+                    uri: `${credentials.url}/api2/repos/${repo_id}/file/?p=${path}${filename}`,
+                    headers: {
+                        'Authorization': `Token ${credentials.apiKey}`,
                     },
-                ],
-                default: 'create',
-                description: 'The operation to perform.',
-            },
-            {
-                displayName: 'Repository ID',
-                name: 'repo_id',
-                type: 'string',
-                default: '',
-                required: true,
-                description: 'The ID of the repository.',
-            },
-            {
-                displayName: 'Path',
-                name: 'path',
-                type: 'string',
-                default: '/',
-                required: true,
-                description: 'Path to the directory.',
-            },
-            {
-                displayName: 'Filename',
-                name: 'filename',
-                type: 'string',
-                default: '',
-                required: true,
-                description: "The file's name.",
-            },
-            {
-                displayName: 'Content',
-                name: 'content',
-                type: 'string',
-                default: '',
-                displayOptions: { show: { operation: ['create'] } },
-                description: "The file's content.",
-            },
-        ],
-    };
+                };
 
-		async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][] | null> {
-		    const items = this.getInputData(); // get input data
-		    const returnData: INodeExecutionData[] = [];
+                const response = await this.helpers.request(options);
+                returnData.push({ json: { data: this.helpers.returnJsonArray([response]) }});
+            }
+        }
 
-		    for(let i = 0; i < items.length; i++){
-		        const operation = this.getNodeParameter('operation', i);
-		        const repo_id = this.getNodeParameter('repo_id', i);
-		        const path = this.getNodeParameter('path', i);
-		        const filename = this.getNodeParameter('filename', i);
-
-		        const credentials = await this.getCredentials('seafileApi');
-		        if (!credentials){
-		            throw new NodeOperationError(this.getNode(), 'No credentials got returned!');
-		        }
-
-		        let options = {};
-
-		        if(operation === 'create'){
-		            const content = this.getNodeParameter('content', i);
-		            options = {
-		                method: 'POST',
-		                uri: `${credentials.url}/api2/repos/${repo_id}/file/?p=${path}`,
-		                formData: {
-		                    "filename": filename,
-		                    "content": content,
-		                },
-		                headers:{
-		                    'Authorization': `Bearer ${credentials.apiKey}`,
-		                },
-		            };
-		        }else if (operation === 'download'){
-		            options = {
-		                method: 'GET',
-		                uri: `${credentials.url}/api2/repos/${repo_id}/file/?p=${path}${filename}`,
-		                headers:{
-		                    'Authorization': `Bearer ${credentials.apiKey}`,
-		                },
-		            };
-		        }
-
-		        const response = await this.helpers.request(options);
-		        returnData.push({json:{ data: this.helpers.returnJsonArray([response]) }});
-		  }
-
-		  return [returnData];
-		}
-	}
+        return [returnData];
+    }
+}

@@ -5,17 +5,17 @@ export class SeafileApi implements ICredentialType {
     displayName = 'Seafile API';
     documentationUrl = 'seafile';
     properties = [
+				{
+					displayName: 'Seafile Server URL',
+					name: 'url',
+					type: 'string' as NodePropertyTypes,
+					default: '',
+			  },
         {
-            displayName: 'API Key',
-            name: 'apiKey',
-            type: 'string' as NodePropertyTypes,
-            default: '',
-        },
-        {
-            displayName: 'Seafile Server URL',
-            name: 'url',
-            type: 'string' as NodePropertyTypes,
-            default: '',
-        },
+					displayName: 'API Key',
+					name: 'apiKey',
+					type: 'string' as NodePropertyTypes,
+					default: '',
+			},
     ];
 }
