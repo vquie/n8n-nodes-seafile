@@ -1,11 +1,9 @@
 import {
-    IExecuteFunctions
-} from 'n8n-core';
-import {
-    INodeExecutionData,
-    INodeType,
-    INodeTypeDescription,
-    NodeOperationError
+	IExecuteFunctions,
+	INodeExecutionData,
+	INodeType,
+	INodeTypeDescription,
+	NodeOperationError
 } from 'n8n-workflow';
 
 export class Seafile implements INodeType {
@@ -83,46 +81,50 @@ export class Seafile implements INodeType {
         ],
     };
 
-    async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-        const items = this.getInputData();
-        const operation = this.getNodeParameter('operation', 0);
-        const repo_id = this.getNodeParameter('repo_id', 0);
-        const path = this.getNodeParameter('path', 0);
-        const filename = this.getNodeParameter('filename', 0);
+		async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][] | null> {
+		    const items = this.getInputData(); // get input data
+		    const returnData: INodeExecutionData[] = [];
 
-        const credentials = this.getCredentials('seafileApi');
-        if (!credentials) {
-            throw new NodeOperationError(this.getNode(), 'No credentials got returned!');
-        }
+		    for(let i = 0; i < items.length; i++){
+		        const operation = this.getNodeParameter('operation', i);
+		        const repo_id = this.getNodeParameter('repo_id', i);
+		        const path = this.getNodeParameter('path', i);
+		        const filename = this.getNodeParameter('filename', i);
 
-        let options = {};
+		        const credentials = await this.getCredentials('seafileApi');
+		        if (!credentials){
+		            throw new NodeOperationError(this.getNode(), 'No credentials got returned!');
+		        }
 
-        if (operation === 'create') {
-            const content = this.getNodeParameter('content', 0);
-            options = {
-                method: 'POST',
-                uri: `${credentials.url}/api2/repos/${repo_id}/file/?p=${path}`,
-                formData: {
-                    filename: filename,
-                    content: content,
-                },
-                headers: {
-									'Authorization': `Bearer ${credentials.apiKey}`, // assuming your API key is stored under a property "apiKey"
-                },
-            };
-        } else if (operation === 'download') {
-            options = {
-                method: 'GET',
-                uri: `${credentials.url}/api2/repos/${repo_id}/file/?p=${path}${filename}`,
-                headers: {
-									'Authorization': `Bearer ${credentials.apiKey}`, // assuming your API key is stored under a property "apiKey"
-								},
-							};
-        }
+		        let options = {};
 
-        const response = await this.helpers.request(options);
+		        if(operation === 'create'){
+		            const content = this.getNodeParameter('content', i);
+		            options = {
+		                method: 'POST',
+		                uri: `${credentials.url}/api2/repos/${repo_id}/file/?p=${path}`,
+		                formData: {
+		                    "filename": filename,
+		                    "content": content,
+		                },
+		                headers:{
+		                    'Authorization': `Bearer ${credentials.apiKey}`, // assuming your API key is stored under a property "apiKey"
+		                },
+		            };
+		        }else if (operation === 'download'){
+		            options = {
+		                method: 'GET',
+		                uri: `${credentials.url}/api2/repos/${repo_id}/file/?p=${path}${filename}`,
+		                headers:{
+		                    'Authorization': `Bearer ${credentials.apiKey}`, // assuming your API key is stored under a property "apiKey"
+		                },
+		            };
+		        }
 
-        return [this.helpers.returnJsonArray([response])];
+		        const response = await this.helpers.request(options);
+		        returnData.push({json:{ data: this.helpers.returnJsonArray([response]) }});
+		  }
 
-    }
-}
+		  return [returnData];
+		}
+	}
