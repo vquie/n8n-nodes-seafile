@@ -42,6 +42,7 @@ export class Seafile implements INodeType {
 											description: 'Download a file',
 									},
 							],
+						  // TODO: delete, rename, share, search, list
 							default: 'upload',
 							description: 'The operation to perform.',
 					},
