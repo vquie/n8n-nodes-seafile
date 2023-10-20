@@ -32,9 +32,9 @@ export class Seafile implements INodeType {
 							type: 'options',
 							options: [
 									{
-											name: 'Create',
-											value: 'create',
-											description: 'Create a file',
+											name: 'Upload',
+											value: 'upload',
+											description: 'Upload a file',
 									},
 									{
 											name: 'Download',
@@ -42,7 +42,7 @@ export class Seafile implements INodeType {
 											description: 'Download a file',
 									},
 							],
-							default: 'create',
+							default: 'upload',
 							description: 'The operation to perform.',
 					},
 					{
@@ -104,7 +104,7 @@ export class Seafile implements INodeType {
             const filename = this.getNodeParameter('filename', i);
             const credentials = await this.getCredentials('seafileApi');
 
-						if (operation === 'create') {
+						if (operation === 'upload') {
 							const binaryData = this.getNodeParameter('binaryData', i, false) as boolean;
 							let content: any;
 							if (binaryData) {
