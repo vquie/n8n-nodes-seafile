@@ -9,7 +9,7 @@ export class Seafile implements INodeType {
 	description: INodeTypeDescription = {
 			displayName: 'Seafile',
 			name: 'seafile',
-			icon: 'file:seafile.png',
+			icon: 'file:seafile.svg',
 			group: ['input'],
 			version: 1,
 			description: 'Consume Seafile API',
