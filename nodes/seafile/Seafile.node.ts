@@ -117,7 +117,7 @@ export class Seafile implements INodeType {
 											throw new Error(`The binary property "${propertyName}" does not exist on item!`);
 									}
 									content = {
-											value: item.binary[propertyName].data,
+											value: Buffer.from(item.binary[propertyName].data, 'base64'), // base64 decoding here
 											options: {
 													filename: filename,
 											},
@@ -138,24 +138,23 @@ export class Seafile implements INodeType {
                 const uploadLink = await this.helpers.request(getUploadLinkOptions);
 								const sanitizedUploadLink = uploadLink.replace(/^"|"$/g, '').replace(/\\"/g, '"');
 
-                if (uploadLink) {
-                    const options = {
-                        method: 'POST',
-                        uri: sanitizedUploadLink,
-                        formData: {
-                            "filename": filename,
-                            "file": content,
-														"parent_dir": path,
-                        },
-                        headers: {
-                            'Authorization': `Token ${credentials.apiKey}`,
-                        },
-                    };
+								if (uploadLink) {
+									const options = {
+											method: 'POST',
+											uri: sanitizedUploadLink,
+											formData: {
+													"filename": filename,
+													"file": content,
+													"parent_dir": path,
+											},
+											headers: {
+													'Authorization': `Token ${credentials.apiKey}`,
+													'Content-Type': 'multipart/form-data'
+											},
+									};
 
 										try {
-											console.log("Options: ", JSON.stringify(options, null, 2));
 											const response = await this.helpers.request(options);
-											console.log("response: " + response);
 											returnData.push({ json: { data: this.helpers.returnJsonArray([response]) }});
 										} catch (error) {
 												console.error("Caught error during request: ", error.message);
