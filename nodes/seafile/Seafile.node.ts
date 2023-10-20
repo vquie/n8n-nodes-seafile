@@ -69,13 +69,27 @@ export class Seafile implements INodeType {
 							required: true,
 							description: "The file's name.",
 					},
+					// This allows the user to specify whether the input is binary
 					{
-							displayName: 'Content',
-							name: 'content',
-							type: 'string',
-							default: '',
-							displayOptions: { show: { operation: ['create'] } },
-							description: "The file's content.",
+						displayName: 'Binary Data',
+						name: 'binaryData',
+						type: 'boolean',
+						required: false,
+						default: false,
+						description: 'Specifies whether the input is binary',
+					},
+					// If binary data is used, this specifies its property name
+					{
+						displayName: 'Property Name',
+						name: 'propertyName',
+						type: 'string',
+						default: '',
+						displayOptions: {
+								show: {
+										binaryData: [true],
+								},
+						},
+						description: 'The name of the binary property to use',
 					},
 			],
 	};
@@ -90,10 +104,30 @@ export class Seafile implements INodeType {
             const filename = this.getNodeParameter('filename', i);
             const credentials = await this.getCredentials('seafileApi');
 
-            if (operation === 'create') {
-                const content = this.getNodeParameter('content', i);
+						if (operation === 'create') {
+							const binaryData = this.getNodeParameter('binaryData', i, false) as boolean;
+							let content: any;
+							if (binaryData) {
+									const propertyName = this.getNodeParameter('propertyName', i, '') as string;
+									const item = items[i];
+									if (item.binary === undefined) {
+											throw new Error('No binary data exists on item!');
+									}
+									if (item.binary[propertyName] === undefined) {
+											throw new Error(`The binary property "${propertyName}" does not exist on item!`);
+									}
+									content = {
+											value: item.binary[propertyName].data,
+											options: {
+													filename: filename,
+											},
+									};
+							} else {
+									content = this.getNodeParameter('content', i);
+							}
 
-                const getUploadLinkOptions = {
+
+							const getUploadLinkOptions = {
                     method: 'GET',
                     uri: `${credentials.url}/api2/repos/${repo_id}/upload-link/?p=${path}`,
                     headers: {
