@@ -12,7 +12,7 @@ export class SeafileApi implements ICredentialType {
             default: '',
         },
         {
-            displayName: 'Instance URL',
+            displayName: 'Seafile Server URL',
             name: 'url',
             type: 'string' as NodePropertyTypes,
             default: '',
