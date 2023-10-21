@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-seafile",
-	"version": "0.1.3",
+	"version": "0.1.4",
 	"description": "Work with the Seafile API",
 	"keywords": [
 		"n8n-community-node-package"
