@@ -206,8 +206,15 @@ export class Seafile implements INodeType {
 									},
 							};
 
-							const response = await this.helpers.request(options);
-							returnData.push({ json: { data: this.helpers.returnJsonArray([response]) } });
+							const rawData = await this.helpers.request(options);
+							const response: {name: string}[] = JSON.parse(rawData);
+							const names = response.map((item: {name: string}) => item.name);
+
+							returnData.push({
+								json: {
+										data: names
+								}
+						});
 					}
 					else if (operation === 'delete_file') {
 						const filename = this.getNodeParameter('filename', i);
