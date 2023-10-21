@@ -20,7 +20,8 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ## Operations
 
-_List the operations supported by your node._
+- Upload
+- Download
 
 ## Credentials
 
