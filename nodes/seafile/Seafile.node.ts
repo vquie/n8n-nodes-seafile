@@ -52,7 +52,7 @@ export class Seafile implements INodeType {
                     description: 'Delete a file',
                 },
 							],
-						  // TODO: delete, rename, share, search
+						  // TODO: rename, share, search
 							default: 'upload_file',
 							description: 'The operation to perform.',
 					},
