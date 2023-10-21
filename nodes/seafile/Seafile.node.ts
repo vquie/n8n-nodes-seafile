@@ -41,6 +41,11 @@ export class Seafile implements INodeType {
 											value: 'download',
 											description: 'Download a file',
 									},
+									{
+										name: 'List',
+										value: 'list',
+										description: 'List a directory',
+									},
 							],
 						  // TODO: delete, rename, share, search, list
 							default: 'upload',
@@ -59,7 +64,15 @@ export class Seafile implements INodeType {
 							name: 'filename',
 							type: 'string',
 							default: '',
-							required: true,
+							displayOptions: {
+								show: {
+										operation: [
+											'upload',
+											'download'
+										],
+								},
+							},
+							required: false,
 							description: "The file's name.",
 					},
 					// This allows the user to specify whether the input is binary
@@ -93,10 +106,10 @@ export class Seafile implements INodeType {
         for (let i = 0; i < items.length; i++) {
             const operation = this.getNodeParameter('operation', i);
             const path = this.getNodeParameter('path', i);
-            const filename = this.getNodeParameter('filename', i);
             const credentials = await this.getCredentials('seafileApi');
 
 						if (operation === 'upload') {
+							const filename = this.getNodeParameter('filename', i);
 							const binaryData = this.getNodeParameter('binaryData', i, false) as boolean;
 							let content: any;
 							if (binaryData) {
@@ -154,6 +167,7 @@ export class Seafile implements INodeType {
                 }
             }
             else if(operation === 'download'){
+								const filename = this.getNodeParameter('filename', i);
                 const options = {
                     method: 'GET',
                     uri: `${credentials.url}/api2/repos/${credentials.repoId}/file/?p=${path}${filename}`,
@@ -165,6 +179,18 @@ export class Seafile implements INodeType {
                 const response = await this.helpers.request(options);
                 returnData.push({ json: { data: this.helpers.returnJsonArray([response]) }});
             }
+						else if(operation === 'list') {
+							const options = {
+									method: 'GET',
+									uri: `${credentials.url}/api2/repos/${credentials.repoId}/dir/?p=${path}`,
+									headers: {
+											'Authorization': `Token ${credentials.apiKey}`,
+									},
+							};
+
+							const response = await this.helpers.request(options);
+							returnData.push({ json: { data: this.helpers.returnJsonArray([response]) } });
+					}
         }
 
         return [returnData];
