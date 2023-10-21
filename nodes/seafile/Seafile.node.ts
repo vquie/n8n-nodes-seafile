@@ -2,7 +2,8 @@ import {
     IExecuteFunctions,
     INodeExecutionData,
     INodeType,
-    INodeTypeDescription
+    INodeTypeDescription,
+		NodeOperationError
 } from 'n8n-workflow';
 
 export class Seafile implements INodeType {
@@ -15,7 +16,6 @@ export class Seafile implements INodeType {
 			description: 'Consume Seafile API',
 			defaults: {
 					name: 'Seafile',
-					color: '#1A82e2',
 			},
 			inputs: ['main'],
 			outputs: ['main'],
@@ -30,31 +30,35 @@ export class Seafile implements INodeType {
 							displayName: 'Operation',
 							name: 'operation',
 							type: 'options',
+							noDataExpression: true,
 							options: [
 									{
 											name: 'Upload File',
 											value: 'upload_file',
 											description: 'Upload a file',
+											action: 'Upload a file',
 									},
 									{
 											name: 'Get Download Link',
 											value: 'get_download_link',
 											description: 'Get the private download link',
+											action: 'Get the private download link',
 									},
 									{
 										name: 'List Directory',
 										value: 'list',
 										description: 'List a directory',
+										action: 'List a directory',
 									},
 									{
                     name: 'Delete File',
                     value: 'delete_file',
                     description: 'Delete a file',
+																				action: 'Delete a file',
                 },
 							],
 						  // TODO: rename, share, search
 							default: 'upload_file',
-							description: 'The operation to perform.',
 					},
 					{
 							displayName: 'Path',
@@ -62,7 +66,7 @@ export class Seafile implements INodeType {
 							type: 'string',
 							default: '/',
 							required: true,
-							description: 'Path to the directory.',
+							description: 'Path to the directory',
 					},
 					{
 							displayName: 'Filename',
@@ -78,15 +82,13 @@ export class Seafile implements INodeType {
 										],
 								},
 							},
-							required: false,
-							description: "The file's name.",
+							description: 'The file\'s name',
 					},
 					// This allows the user to specify whether the input is binary
 					{
 						displayName: 'Binary Data',
 						name: 'binaryData',
 						type: 'boolean',
-						required: false,
 						default: false,
 						displayOptions: {
 							show: {
@@ -95,7 +97,7 @@ export class Seafile implements INodeType {
 									],
 							},
 						},
-						description: 'Specifies whether the input is binary',
+						description: 'Whether the input is binary',
 					},
 					// If binary data is used, this specifies its property name
 					{
@@ -132,10 +134,10 @@ export class Seafile implements INodeType {
 									const propertyName = this.getNodeParameter('propertyName', i, '') as string;
 									const item = items[i];
 									if (item.binary === undefined) {
-											throw new Error('No binary data exists on item!');
+										throw new NodeOperationError(this.getNode(), 'No binary data exists on item!');
 									}
 									if (item.binary[propertyName] === undefined) {
-											throw new Error(`The binary property "${propertyName}" does not exist on item!`);
+											throw new NodeOperationError(this.getNode(), `The binary property "${propertyName}" does not exist on item!`);
 									}
 									content = {
 											value: Buffer.from(item.binary[propertyName].data, 'base64'), // base64 decoding here
