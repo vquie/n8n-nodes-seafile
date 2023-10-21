@@ -34,18 +34,23 @@ export class Seafile implements INodeType {
 									{
 											name: 'Upload File',
 											value: 'upload_file',
-											description: 'Upload File a file',
+											description: 'Upload a file',
 									},
 									{
 											name: 'Get Download Link',
 											value: 'get_download_link',
-											description: 'Get the private Download Link',
+											description: 'Get the private download link',
 									},
 									{
 										name: 'List Directory',
 										value: 'list',
 										description: 'List a directory',
 									},
+									{
+                    name: 'Delete File',
+                    value: 'delete_file',
+                    description: 'Delete a file',
+                },
 							],
 						  // TODO: delete, rename, share, search
 							default: 'upload_file',
@@ -68,7 +73,8 @@ export class Seafile implements INodeType {
 								show: {
 										operation: [
 											'upload_file',
-											'get_download_link'
+											'get_download_link',
+											'delete_file'
 										],
 								},
 							},
@@ -201,6 +207,21 @@ export class Seafile implements INodeType {
 							const response = await this.helpers.request(options);
 							returnData.push({ json: { data: this.helpers.returnJsonArray([response]) } });
 					}
+					else if (operation === 'delete_file') {
+						const filename = this.getNodeParameter('filename', i);
+						const options = {
+								method: 'DELETE',
+								url: `${credentials.url}/api2/repos/${credentials.repoId}/file/?p=${path}${filename}`,
+								params: {
+										p: path,
+								},
+								headers: {
+										'Authorization': `Token ${credentials.apiKey}`,
+								},
+						};
+						const response = await this.helpers.request(options);
+						returnData.push({ json: { data: this.helpers.returnJsonArray([response]) }});
+				}
         }
 
         return [returnData];

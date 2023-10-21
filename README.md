@@ -20,8 +20,10 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ## Operations
 
-- Upload
-- Download
+- Upload File
+- Get Download Link
+- List Directory
+- Delete File
 
 ## Credentials
 
