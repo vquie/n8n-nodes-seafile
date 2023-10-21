@@ -82,6 +82,13 @@ export class Seafile implements INodeType {
 						type: 'boolean',
 						required: false,
 						default: false,
+						displayOptions: {
+							show: {
+									operation: [
+										'upload'
+									],
+							},
+						},
 						description: 'Specifies whether the input is binary',
 					},
 					// If binary data is used, this specifies its property name
@@ -93,6 +100,9 @@ export class Seafile implements INodeType {
 						displayOptions: {
 								show: {
 										binaryData: [true],
+										operation: [
+											'upload'
+										],
 								},
 						},
 						description: 'The name of the binary property to use',
