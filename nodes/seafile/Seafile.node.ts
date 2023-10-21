@@ -32,23 +32,23 @@ export class Seafile implements INodeType {
 							type: 'options',
 							options: [
 									{
-											name: 'Upload',
-											value: 'upload',
-											description: 'Upload a file',
+											name: 'Upload File',
+											value: 'upload_file',
+											description: 'Upload File a file',
 									},
 									{
-											name: 'Download',
-											value: 'download',
-											description: 'Download a file',
+											name: 'Get Download Link',
+											value: 'get_download_link',
+											description: 'Get the private Download Link',
 									},
 									{
-										name: 'List',
+										name: 'List Directory',
 										value: 'list',
 										description: 'List a directory',
 									},
 							],
-						  // TODO: delete, rename, share, search, list
-							default: 'upload',
+						  // TODO: delete, rename, share, search
+							default: 'upload_file',
 							description: 'The operation to perform.',
 					},
 					{
@@ -67,8 +67,8 @@ export class Seafile implements INodeType {
 							displayOptions: {
 								show: {
 										operation: [
-											'upload',
-											'download'
+											'upload_file',
+											'get_download_link'
 										],
 								},
 							},
@@ -85,7 +85,7 @@ export class Seafile implements INodeType {
 						displayOptions: {
 							show: {
 									operation: [
-										'upload'
+										'upload_file'
 									],
 							},
 						},
@@ -101,7 +101,7 @@ export class Seafile implements INodeType {
 								show: {
 										binaryData: [true],
 										operation: [
-											'upload'
+											'upload_file'
 										],
 								},
 						},
@@ -118,7 +118,7 @@ export class Seafile implements INodeType {
             const path = this.getNodeParameter('path', i);
             const credentials = await this.getCredentials('seafileApi');
 
-						if (operation === 'upload') {
+						if (operation === 'upload_file') {
 							const filename = this.getNodeParameter('filename', i);
 							const binaryData = this.getNodeParameter('binaryData', i, false) as boolean;
 							let content: any;
@@ -176,7 +176,7 @@ export class Seafile implements INodeType {
 										}
                 }
             }
-            else if(operation === 'download'){
+            else if(operation === 'get_download_link'){
 								const filename = this.getNodeParameter('filename', i);
                 const options = {
                     method: 'GET',
