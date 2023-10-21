@@ -16,6 +16,12 @@ export class SeafileApi implements ICredentialType {
 					name: 'apiKey',
 					type: 'string' as NodePropertyTypes,
 					default: '',
+				},
+				{
+					displayName: 'Seafile Repository ID',
+					name: 'repoId',
+					type: 'string' as NodePropertyTypes,
+					default: '',
 			},
     ];
 }

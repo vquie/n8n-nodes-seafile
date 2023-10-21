@@ -47,14 +47,6 @@ export class Seafile implements INodeType {
 							description: 'The operation to perform.',
 					},
 					{
-							displayName: 'Repository ID',
-							name: 'repo_id',
-							type: 'string',
-							default: '',
-							required: true,
-							description: 'The ID of the repository.',
-					},
-					{
 							displayName: 'Path',
 							name: 'path',
 							type: 'string',
@@ -100,7 +92,6 @@ export class Seafile implements INodeType {
         const returnData: INodeExecutionData[] = [];
         for (let i = 0; i < items.length; i++) {
             const operation = this.getNodeParameter('operation', i);
-            const repo_id = this.getNodeParameter('repo_id', i);
             const path = this.getNodeParameter('path', i);
             const filename = this.getNodeParameter('filename', i);
             const credentials = await this.getCredentials('seafileApi');
@@ -130,7 +121,7 @@ export class Seafile implements INodeType {
 
 							const getUploadLinkOptions = {
                     method: 'GET',
-                    uri: `${credentials.url}/api2/repos/${repo_id}/upload-link/?p=${path}`,
+                    uri: `${credentials.url}/api2/repos/${credentials.repoId}/upload-link/?p=${path}`,
                     headers: {
                         'Authorization': `Token ${credentials.apiKey}`,
                     },
@@ -165,7 +156,7 @@ export class Seafile implements INodeType {
             else if(operation === 'download'){
                 const options = {
                     method: 'GET',
-                    uri: `${credentials.url}/api2/repos/${repo_id}/file/?p=${path}${filename}`,
+                    uri: `${credentials.url}/api2/repos/${credentials.repoId}/file/?p=${path}${filename}`,
                     headers: {
                         'Authorization': `Token ${credentials.apiKey}`,
                     },
