@@ -1,18 +1,14 @@
-# Draft: n8n-nodes-seafile
+# n8n-nodes-seafile
 
-This is an n8n community node. It lets you use Seafile in your n8n workflows.
-
-_App/service name_ is _one or two sentences describing the service this node integrates with_.
+This Seafile node for n8n is designed to set parameters and execute specific operations for the Seafile API. The main operations include uploading a file, retrieving a private download link, listing a directory, and deleting a file. You have the ability to define the operation, path, filename, and more. Then it utilizes these inputs to process the operation by making the respective API call to the Seafile server. The node executes the input data items one by one and returns an array of execution data.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
 [Installation](#installation)  
 [Operations](#operations)  
-[Credentials](#credentials)  <!-- delete if no auth needed -->  
+[Credentials](#credentials)  
 [Compatibility](#compatibility)  
-[Usage](#usage)  <!-- delete if not using this section -->  
 [Resources](#resources)  
-[Version history](#version-history)  <!-- delete if not using this section -->  
 
 ## Installation
 
@@ -27,25 +23,20 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ## Credentials
 
-_If users need to authenticate with the app/service, provide details here. You should include prerequisites (such as signing up with the service), available authentication methods, and how to set them up._
+The credentials file for the Seafile node in n8n will require three pieces of information from the user:
+
+- **Seafile Server URL**: The URL of the Seafile server. This should be the base URL of the Seafile instance you want to connect to.
+- **API Key**: The API Key for interacting with the [Seafile API](https://download.seafile.com/published/web-api/home.md).
+- **Seafile Repository ID**: The unique identifier of the repository in Seafile where your operations would be carried out.
 
 ## Compatibility
 
-_State the minimum n8n version, as well as which versions you test against. You can also include any known version incompatibility issues._
+Tested with:
 
-## Usage
-
-_This is an optional section. Use it to help users with any difficult or confusing aspects of the node._
-
-_By the time users are looking for community nodes, they probably already know n8n basics. But if you expect new users, you can link to the [Try it out](https://docs.n8n.io/try-it-out/) documentation to help them get started._
+- Seafile Community Edition 10.0.1
+- n8n 1.12.0
 
 ## Resources
 
 * [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/)
-* _Link to app/service documentation._
-
-## Version history
-
-_This is another optional section. If your node has multiple versions, include a short description of available versions and what changed, as well as any compatibility impact._
-
-
+* [Seafile](https://www.seafile.com/)

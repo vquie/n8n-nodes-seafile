@@ -1,7 +1,7 @@
 {
 	"name": "n8n-nodes-seafile",
-	"version": "0.1.4",
-	"description": "Work with the Seafile API",
+	"version": "1.0.0",
+	"description": "This Seafile node for n8n is designed to set parameters and execute specific operations for the Seafile API. The main operations include uploading a file, retrieving a private download link, listing a directory, and deleting a file. You have the ability to define the operation, path, filename, and more. Then it utilizes these inputs to process the operation by making the respective API call to the Seafile server. The node executes the input data items one by one and returns an array of execution data.",
 	"keywords": [
 		"n8n-community-node-package"
 	],
