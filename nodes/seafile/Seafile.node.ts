@@ -123,7 +123,11 @@ export class Seafile implements INodeType {
         const returnData: INodeExecutionData[] = [];
         for (let i = 0; i < items.length; i++) {
             const operation = this.getNodeParameter('operation', i);
-            const path = this.getNodeParameter('path', i);
+						const path = this.getNodeParameter('path', i);
+						let encodedPath;
+						if (path !== undefined && typeof path === 'string') {
+								encodedPath = encodeURIComponent(path);
+						}
             const credentials = await this.getCredentials('seafileApi');
 
 						if (operation === 'upload_file') {
@@ -152,7 +156,7 @@ export class Seafile implements INodeType {
 
 							const getUploadLinkOptions = {
                     method: 'GET',
-                    uri: `${credentials.url}/api2/repos/${credentials.repoId}/upload-link/?p=${path}`,
+                    uri: `${credentials.url}/api2/repos/${credentials.repoId}/upload-link/?p=${encodedPath}`,
                     headers: {
                         'Authorization': `Token ${credentials.apiKey}`,
                     },
@@ -185,10 +189,14 @@ export class Seafile implements INodeType {
                 }
             }
             else if(operation === 'get_download_link'){
-								const filename = this.getNodeParameter('filename', i);
+							const filename = this.getNodeParameter('filename', i);
+							let encodedFilename;
+							if (filename !== undefined && typeof filename === 'string') {
+									encodedFilename = encodeURIComponent(filename);
+							}
                 const options = {
                     method: 'GET',
-                    uri: `${credentials.url}/api2/repos/${credentials.repoId}/file/?p=${path}${filename}`,
+                    uri: `${credentials.url}/api2/repos/${credentials.repoId}/file/?p=${encodedPath}${encodedFilename}`,
                     headers: {
                         'Authorization': `Token ${credentials.apiKey}`,
                     },
@@ -200,7 +208,7 @@ export class Seafile implements INodeType {
 						else if(operation === 'list') {
 							const options = {
 									method: 'GET',
-									uri: `${credentials.url}/api2/repos/${credentials.repoId}/dir/?p=${path}`,
+									uri: `${credentials.url}/api2/repos/${credentials.repoId}/dir/?p=${encodedPath}`,
 									headers: {
 											'Authorization': `Token ${credentials.apiKey}`,
 									},
@@ -216,10 +224,14 @@ export class Seafile implements INodeType {
 							}
 					}
 					else if (operation === 'delete_file') {
-						const filename = this.getNodeParameter('filename', i);
+            const filename = this.getNodeParameter('filename', i);
+            let encodedFilename;
+            if (filename !== undefined && typeof filename === 'string') {
+                encodedFilename = encodeURIComponent(filename);
+            }
 						const options = {
 								method: 'DELETE',
-								url: `${credentials.url}/api2/repos/${credentials.repoId}/file/?p=${path}${filename}`,
+								url: `${credentials.url}/api2/repos/${credentials.repoId}/file/?p=${encodedPath}${encodedFilename}`,
 								params: {
 										p: path,
 								},
