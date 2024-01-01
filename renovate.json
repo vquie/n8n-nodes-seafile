@@ -1,8 +1,8 @@
 {
-	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "packageRules": [
     {
-      "extends": "packages:linters",
+      "extends": ["packages:linters"],
       "groupName": "linters"
     }
   ]
