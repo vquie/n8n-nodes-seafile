@@ -153,14 +153,25 @@ export class Seafile implements INodeType {
 									content = this.getNodeParameter('content', i);
 							}
 
-
-							const getUploadLinkOptions = {
-                    method: 'GET',
-                    uri: `${credentials.url}/api2/repos/${credentials.repoId}/upload-link/?p=${encodedPath}`,
-                    headers: {
-                        'Authorization': `Token ${credentials.apiKey}`,
-                    },
-                };
+								const useLibraryToken = credentials.useLibraryToken as boolean;
+								let getUploadLinkOptions;
+								if (useLibraryToken) {
+										getUploadLinkOptions = {
+												method: 'GET',
+												uri: `${credentials.url}/api/v2.1/via-repo-token/upload-link/?path=${encodedPath}`,
+												headers: {
+														'Authorization': `Token ${credentials.apiKey}`,
+												},
+										};
+								} else {
+										getUploadLinkOptions = {
+												method: 'GET',
+												uri: `${credentials.url}/api2/repos/${credentials.repoId}/upload-link/?p=${encodedPath}`,
+												headers: {
+														'Authorization': `Token ${credentials.apiKey}`,
+												},
+										};
+								}
 
                 const uploadLink = await this.helpers.request(getUploadLinkOptions);
 								const sanitizedUploadLink = uploadLink.replace(/^"|"$/g, '').replace(/\\"/g, '"');
@@ -188,41 +199,67 @@ export class Seafile implements INodeType {
 										}
                 }
             }
-            else if(operation === 'get_download_link'){
+            else if (operation === 'get_download_link') {
 							const filename = this.getNodeParameter('filename', i);
 							let encodedFilename;
 							if (filename !== undefined && typeof filename === 'string') {
 									encodedFilename = encodeURIComponent(filename);
 							}
-                const options = {
-                    method: 'GET',
-                    uri: `${credentials.url}/api2/repos/${credentials.repoId}/file/?p=${encodedPath}${encodedFilename}`,
-                    headers: {
-                        'Authorization': `Token ${credentials.apiKey}`,
-                    },
-                };
-
-                const response = await this.helpers.request(options);
-                returnData.push({ json: { data: this.helpers.returnJsonArray([response]) }});
-            }
-						else if(operation === 'list') {
-							const options = {
-									method: 'GET',
-									uri: `${credentials.url}/api2/repos/${credentials.repoId}/dir/?p=${encodedPath}`,
-									headers: {
-											'Authorization': `Token ${credentials.apiKey}`,
-									},
-							};
-
-							const rawData = await this.helpers.request(options);
-							const response: {name: string}[] = JSON.parse(rawData);
-
-							for (const item of response) {
-									returnData.push({
-											json: { name: item.name }
-									});
+							let options;
+							if (credentials.useLibraryToken) {
+									options = {
+											method: 'GET',
+											uri: `${credentials.url}/api/v2.1/via-repo-token/download-link/?path=${encodedPath}${encodedFilename}`,
+											headers: {
+													'Authorization': `Token ${credentials.apiKey}`,
+											},
+									};
+							} else {
+									options = {
+											method: 'GET',
+											uri: `${credentials.url}/api2/repos/${credentials.repoId}/file/?p=${encodedPath}${encodedFilename}`,
+											headers: {
+													'Authorization': `Token ${credentials.apiKey}`,
+											},
+									};
 							}
+							const response = await this.helpers.request(options);
+							returnData.push({ json: { data: this.helpers.returnJsonArray([response]) }});
 					}
+					else if (operation === 'list') {
+						let options;
+						if (credentials.useLibraryToken) {
+								options = {
+										method: 'GET',
+										uri: `${credentials.url}/api/v2.1/via-repo-token/dir/?path=${encodedPath}`,
+										headers: {
+												'Authorization': `Token ${credentials.apiKey}`,
+										},
+								};
+								const rawData = await this.helpers.request(options);
+								const response: {name: string}[] = JSON.parse(rawData).dirent_list;
+								for (const item of response) {
+										returnData.push({
+												json: { name: item.name }
+										});
+								}
+						} else {
+								options = {
+										method: 'GET',
+										uri: `${credentials.url}/api2/repos/${credentials.repoId}/dir/?p=${encodedPath}`,
+										headers: {
+												'Authorization': `Token ${credentials.apiKey}`,
+										},
+								};
+								const rawData = await this.helpers.request(options);
+								const response: {name: string}[] = JSON.parse(rawData);
+								for (const item of response) {
+										returnData.push({
+												json: { name: item.name }
+										});
+								}
+						}
+				}
 					else if (operation === 'delete_file') {
             const filename = this.getNodeParameter('filename', i);
             let encodedFilename;
