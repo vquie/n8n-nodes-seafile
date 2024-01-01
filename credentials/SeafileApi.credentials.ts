@@ -12,7 +12,7 @@ export class SeafileApi implements ICredentialType {
       default: ''
 	  	},
     {
-      displayName: 'API Key',
+      displayName: 'API Token',
       name: 'apiKey',
       type: 'string',
       typeOptions: { password: true },
