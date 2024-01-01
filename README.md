@@ -26,7 +26,7 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 The credentials file for the Seafile node in n8n will require three pieces of information from the user:
 
 - **Seafile Server URL**: The URL of the Seafile server. This should be the base URL of the Seafile instance you want to connect to.
-- **API Key**: The API Key for interacting with the [Seafile API](https://download.seafile.com/published/web-api/home.md).
+- **API Token**: The API Token for interacting with the [Seafile API](https://download.seafile.com/published/web-api/home.md).
 - **Seafile Repository ID**: The unique identifier of the repository in Seafile where your operations would be carried out.
 - **Use Library API Token**: You can choose to use the Library API Token instead of the Global API Token. The Library API Token does not support all operations
 
