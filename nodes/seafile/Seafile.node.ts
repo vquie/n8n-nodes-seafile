@@ -51,11 +51,11 @@ export class Seafile implements INodeType {
 										action: 'List a directory',
 									},
 									{
-                    name: 'Delete File',
-                    value: 'delete_file',
-                    description: 'Delete a file',
-																				action: 'Delete a file',
-                },
+										name: 'Delete File',
+										value: 'delete_file',
+										description: 'Delete a file (Note: This operation does not work when using Library Tokens)',
+										action: 'Delete a file',
+								},
 							],
 						  // TODO: rename, share, search
 							default: 'upload_file',

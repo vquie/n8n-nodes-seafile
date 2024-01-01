@@ -29,7 +29,7 @@ export class SeafileApi implements ICredentialType {
 			name: 'useLibraryToken',
 			type: 'boolean',
 			default: false,
-			description: 'Toggle this on if you want to use the Library API Token. The Library API Token does not support every action. Defaults to 'False' which uses the Global API Token.',
+			description: 'Toggle this on if you want to use the Library API Token. The Library API Token does not support every action. Defaults to `False` which uses the Global API Token.',
 		},
     ];
 }
